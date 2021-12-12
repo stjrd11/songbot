@@ -52,7 +52,7 @@ def addUserBump(user):
         for i in range(len(df.username)):
             if user == df.username[i]:
                 df.at[i, 'bump'] = newValue
-                df.to_csv('slamData.csv', index=False)
+                df.to_csv('data.csv', index=False)
 
 def addUserPrio(user):
     prioBump = getUserPrio(user)
