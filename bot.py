@@ -237,7 +237,7 @@ class Bot(commands.Bot):
     async def last(self, ctx:commands.Context):
         user = ctx.author.name
         values_list = songHistory.row_values(2)
-        await ctx.send(f'{user}, the last song Slam played from the queue was "{values_list[0]},\" requested by {values_list[2]}. {values_list[3]}')
+        await ctx.send(f'{user}, the last song played from the queue was "{values_list[0]},\" requested by {values_list[2]}. {values_list[3]}')
 
     @commands.command()
     async def oops(self, ctx:commands.Context):
