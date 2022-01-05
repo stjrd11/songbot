@@ -444,11 +444,20 @@ class Bot(commands.Bot):
     async def savesong(self, ctx:commands.Context):
         if ctx.author.is_mod:
             values_list = songBank.row_values(2)
-            df = pd.DataFrame({'link':[values_list[3]],
-                                'time':[int(time.time())],
-                                'name':[values_list[2]]})
-            df.to_csv('savedSongs.csv', mode='a', index=False, header=False)
-            await ctx.send(f'{values_list[0]} has been saved.')
+            user = values_list[2]
+            df = pd.read_csv('savedSongs.csv')
+            for i in range(len(df.link)):
+                if [values_list[3]] == df.link[i]:
+                    newValue = df.name[i] + " and " + user
+                    df.at[i, 'name'] = newValue
+                    df.to_csv('savedSongs.csv', index=False)
+                    await ctx.send(f'{values_list[0]} has been saved.')
+                else:
+                    df = pd.DataFrame({'link':[values_list[3]],
+                                        'time':[int(time.time())],
+                                        'name':[values_list[2]]})
+                    df.to_csv('savedSongs.csv', mode='a', index=False, header=False)
+                    await ctx.send(f'{values_list[0]} has been saved.')
 
     @commands.command()
     async def randomsaved(self, ctx:commands.Context):
