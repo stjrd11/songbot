@@ -1,15 +1,17 @@
 from twitchio.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-from twitchio.ext.commands.core import cooldown
 from botconfig import *
 import csvmethods as csvm
 import songrequest as srs
 import bump as bmp
-from gspread.models import Cell
+from gspread import Cell
 from logging import Logger
 from pytube import YouTube
 import datetime
+import time
+import pandas as pd
+import random
 
 scope = ['https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file",
         "https://www.googleapis.com/auth/drive"]
@@ -63,6 +65,7 @@ class Bot(commands.Bot):
             userLimit = bmp.getBumpsPlayedLimit(user)
             bumpCheck = bmp.getUserBump(user)
             prioCheck = bmp.getUserPrio(user)
+            banCheck = csvm.banCheck(url)
             if ctx.author.is_mod:
                 next = int(srs.next_available_row(songBank))
                 srs.updateSongBank(next, title, duration, user, url)
@@ -74,23 +77,25 @@ class Bot(commands.Bot):
                 await ctx.send(f'{user}, that song is {duration}, the max length is {str(datetime.timedelta(seconds=length))} SeemsGood')
             elif yt.views < views:
                 await ctx.send(f"{user}, song requests need more than {views} views SeemsGood")
+            elif banCheck is True:
+                await ctx.send(f'{user}, that song is banned.')
             else:
                 cell_list = songBank.find(user)
                 listCheck = songBank.findall(user)
                 songCount = len(listCheck)
                 checkList = songBank.find(url)
-                if songCount >= 2:
-                    await ctx.send(f"{user}, only one song in the queue at a time SeemsGood")  
+                if songCount >= maxSongsInQ:
+                    await ctx.send(f"{user}, you can only have {maxSongsInQ} song(s) in the queue at a time SeemsGood")  
                 elif cell_list is not None and cell_list.row != 2:
-                    await ctx.send(f"{user}, only one song in the queue at a time SeemsGood")   
+                    await ctx.send(f"{user}, you can only have {maxSongsInQ} song(s) in the queue at a time SeemsGood")   
                 elif checkList is not None:
                     await ctx.send(f'{user}, that song is already in the queue!')
-                elif prioCheck > 0 and userLimit < 2:
+                elif prioCheck > 0 and userLimit < maxPlayedBumpsPerStream:
                     insertRow = srs.getPrioInsert()
                     srs.prioBumpedSong(insertRow, title, duration, user, url)
                     await ctx.send(f'{user}, your song, \"{title},\" has been priority bumped to position {insertRow - 1}')
                     print(bumpCheck)
-                elif bumpCheck > 0 and userLimit < 2:
+                elif bumpCheck > 0 and userLimit < maxPlayedBumpsPerStream:
                     insertRow = srs.getBumpInsert()
                     srs.bumpedSong(insertRow, title, duration, user, url)
                     await ctx.send(f'{user}, your song, \"{title},\" has been bumped to position {insertRow - 1}')
@@ -100,7 +105,7 @@ class Bot(commands.Bot):
                     position = next - 1
                     await ctx.send(f'{user}, your song, \"{title},\" has been added to the queue at position {position}')
         except Exception:
-            await ctx.send(f'{user}, an error occured for some unknown reason. Try again, and Slam, check the logs D:')
+            await ctx.send(f'{user}, an error occured for some unknown reason. Try again.')
             Logger.exception("message")
 
     @commands.command()
@@ -124,9 +129,9 @@ class Bot(commands.Bot):
             yt = YouTube(url)
             title = yt.title
             duration = str(datetime.timedelta(seconds=yt.length))
-            cell = songBank.find(user)
+            cell = songBank.findall(user)
             if ctx.author.is_mod:
-                userRow = cell.row
+                userRow = cell[-1].row
                 srs.updateSongBank(userRow, title, duration, user, url)
                 await ctx.send(f'{user}, you have changed your song to \"{title}.\"')
             elif cell is None:
@@ -140,17 +145,17 @@ class Bot(commands.Bot):
                 if checkList is not None:
                     await ctx.send(f'{user}, that song is already in the queue!')
                 else:
-                    userRow = cell.row
-                    if cell.row == 2:
+                    userRow = cell[-1].row
+                    if userRow == 2:
                         await ctx.send(f'{user}, you can\'t change your song when it\'s currently playing.')
                     else:
                         srs.updateSongBank(userRow, title, duration, user, url)
                         await ctx.send(f'{user}, you have changed your song to \"{title}.\"')
         except Exception:
-            await ctx.send(f'{user}, an error occured for some unknown reason. Try again, and Slam, check the logs D:')
+            await ctx.send(f'{user}, an error occured for some unknown reason. Try again')
             Logger.exception("message")
 
-    @commands.command(name='wrongsong', aliases=['remove', 'removesong'])
+    @commands.command(name='wrongsong', aliases=['removesong'])
     async def wrongsong(self, ctx:commands.Context):
         user = ctx.author.name
         cell = songBank.findall(user)
@@ -159,10 +164,24 @@ class Bot(commands.Bot):
         else:
             userRow = cell[-1].row
             if userRow == 2:
-                await ctx.send(f"{user}, Slam might currently be playing your song! You can't delete it right now! D:")
+                await ctx.send(f"{user}, your song might currently be playing! You can't delete it right now! D:")
             else:
                 songBank.delete_rows(userRow)
                 await ctx.send(f'{user}, your song has been deleted SeemsGood')
+
+    @commands.command()
+    async def remove(self, ctx:commands.Context, *, entry:str):
+        if ctx.author.is_mod:
+            entry = entry[0]
+            entry = entry.lower()
+            user = entry.replace("@", "")
+            cell = songBank.findall(user)
+            if cell is None:
+                await ctx.send(f'{ctx.author.name}, {user} does not have a song in the queue.')
+            else:
+                userRow = cell[-1].row
+                songBank.delete_rows(userRow)
+                await ctx.send(f'{user}\'s song has been deleted.')
 
     @commands.command(name='song', aliases=['whatsong', 'whatsongisthis'])
     async def song(self, ctx:commands.Context):
@@ -245,7 +264,8 @@ class Bot(commands.Bot):
         songBank.insert_row(values_list, 2)
         songHistory.delete_rows(2)
         songBank.update('E2', '*NOW PLAYING*')
-        await ctx.send('A mistake was made in the queue. Fixed.')
+        songBank.update('E3', ' ')
+        await ctx.send('Let\'s try to correct that mistake.')
 
     @commands.command(name='list', aliases=['sl', 'songlist', 'queue', 'songqueue', 'q', 'sq'])
     async def list(self, ctx:commands.Context):
@@ -369,8 +389,10 @@ class Bot(commands.Bot):
             yt = YouTube(url)
             title = yt.title
             duration = str(datetime.timedelta(seconds=yt.length))
+            extendTime = str(datetime.timedelta(seconds=extendedLength))
             if yt.length > extendedLength:
-                await ctx.send(f'{user}, that song is too long for an extended requested. The max length is 0:11:00, that song is {duration}.')
+                await ctx.send(f'{user}, that song is too long for an extended requested. The max length is {extendTime}\
+                    , that song is {duration}.')
             else:
                 bumpInsertRow = srs.getBumpInsert()
                 srs.bumpedSong(bumpInsertRow, title, duration, user, url)
@@ -408,6 +430,136 @@ class Bot(commands.Bot):
             await ctx.send(f'{ctx.author.name}, you do have a bump')
         else:
             await ctx.send(f'{ctx.author.name}, you do not have a bump')
+
+    @commands.command()
+    async def bansong(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            values_list = songBank.row_values(2)
+            df = pd.DataFrame({'link': [values_list[3]],
+                                'user': [values_list[2]]})
+            df.to_csv('bannedsongs.csv', mode='a', index=False, header=False)
+            await ctx.send(f'{values_list[0]} has been added to the ban list.')
+
+    @commands.command()
+    async def savesong(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            values_list = songBank.row_values(2)
+            df = pd.DataFrame({'link':[values_list[3]],
+                                'time':[int(time.time())],
+                                'name':[values_list[2]]})
+            df.to_csv('savedSongs.csv', mode='a', index=False, header=False)
+            await ctx.send(f'{values_list[0]} has been saved.')
+
+    @commands.command()
+    async def randomsaved(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            df = pd.read_csv('savedSongs.csv', encoding="UTF8")
+            rows = len(df.axes[0])
+            randomNum = random.randint(0, rows)
+            link = df.link[randomNum]
+            seconds = df.time[randomNum]
+            date = csvm.getDate(seconds)
+            name = df.name(randomNum)
+            user = 'Saved Song'
+            yt = YouTube(link)
+            title = yt.title
+            duration = str(datetime.timedelta(seconds=yt.length))
+            insertRow = srs.getBumpInsert()
+            srs.bumpedSong(insertRow, title, duration, user, link)
+            await ctx.send(f'Let\'s play a random saved song! How about {title}? This song was requested by {name} and saved on {date}.')
+
+    @commands.command()
+    async def randomize(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            songs = srs.next_available_row() - 1
+            randomSong = random.randint(3,songs)
+            values_list = songBank.row_values(randomSong)
+            bumpRow = srs.getBumpInsert()
+            srs.bumpedSong(bumpRow, values_list[0],values_list[1],values_list[2],values_list[3])
+            await ctx.send(f'{values_list[2]}, your song has been chosen by the randomized gods!')
+
+    @commands.command()
+    async def startraffle(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            global joinAvail
+            joinAvail = 1
+            await ctx.send('A raffle has started for something. Please type !join to enter!')
+
+    @commands.command()
+    async def join(self, ctx:commands.Context):
+        if joinAvail == 0:
+            await ctx.send('There\'s no raffle right now Jebaited')
+        else:
+            user = ctx.author.name
+            cell = songBank.find(user)
+            if cell is None:
+                await ctx.send(f'{user}, you must have a song in the queue before you can join a raffle.')
+            elif cell.row == 2:
+                await ctx.send(f'{user}, add another song to the queue before you join.')
+            else:
+                raffleCheck = csvm.checkRaffle(user)
+                winnerCheck = csvm.checkWinner(user)
+                if raffleCheck == 1:
+                    await ctx.send(f'{user}, you\'re already in the raffle.')
+                elif winnerCheck == 1:
+                    await ctx.send(f'{user}, you just won a raffle. You have to wait until the next one to join.')
+                else:
+                    csvm.addToRaffle(user)
+                    await ctx.send(f'{user}, you have been added to the raffle!')
+
+    @commands.command()
+    async def endprio(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            csvm.resetEligible()
+            global joinAvail
+            joinAvail = 0
+            winner = csvm.getWinner()
+            if winner == 0:
+                await ctx.send(f'No one entered the raffle.')
+            else:
+                csvm.addRaffleWin(winner)
+                csvm.resetRaffle()
+                cell = songBank.find(winner)
+                userRow = cell.row
+                values_list = songBank.row_values(userRow)
+                songBank.delete_rows(userRow)
+                insertRow = srs.getPrioInsert()
+                srs.prioBumpedSong(insertRow, values_list[0], values_list[1], values_list[2], values_list[3])
+                await ctx.send(f'{winner} wins! You get a prio bump!')
+
+    @commands.command()
+    async def endbump(self, ctx:commands.Context):
+        if ctx.author.is_mod:
+            csvm.resetEligible()
+            global joinAvail
+            joinAvail = 0
+            winner = csvm.getWinner()
+            if winner == 0:
+                await ctx.send(f'No one entered the raffle.')
+            else:
+                csvm.addRaffleWin(winner)
+                csvm.resetRaffle()
+                cell = songBank.find(winner)
+                userRow = cell.row
+                values_list = songBank.row_values(userRow)
+                songBank.delete_rows(userRow)
+                insertRow = srs.getBumpInsert()
+                srs.bumpedSong(insertRow, values_list[0], values_list[1], values_list[2], values_list[3])
+                await ctx.send(f'{winner} wins! You get a bump!')
+
+    @commands.command()
+    async def endraffle(self, ctx:commands.Context):
+            csvm.resetEligible()
+            global joinAvail
+            joinAvail = 0
+            winner = csvm.getWinner()
+            if winner == 0:
+                await ctx.send(f'No one entered the raffle.')
+            else:
+                csvm.addRaffleWin(winner)
+                csvm.resetRaffle()
+                await ctx.send(f'{winner} wins! You get NOTHING!')
+
 
 
 bot = Bot()
