@@ -1,4 +1,6 @@
 # songbot
+THIS WILL BE FORMATTED AND LOOK PRETTIER SOON
+
 rough template for a song bot utilizing google sheets and twitchio
 
 if you decide to use this, let me know if you experience issues
