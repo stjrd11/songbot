@@ -260,12 +260,12 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def oops(self, ctx:commands.Context):
-        values_list = songHistory.row_values(2)
-        songBank.insert_row(values_list, 2)
-        songHistory.delete_rows(2)
-        songBank.update('E2', '*NOW PLAYING*')
-        songBank.update('E3', ' ')
-        await ctx.send('Let\'s try to correct that mistake.')
+        if ctx.author.is_mod:
+            values_list = songHistory.row_values(2)
+            songBank.insert_row(values_list, 2)
+            songHistory.delete_rows(2)
+            songBank.update('E2', '*NOW PLAYING*')
+            await ctx.send('A mistake was made in the queue. Fixed.')
 
     @commands.command(name='list', aliases=['sl', 'songlist', 'queue', 'songqueue', 'q', 'sq'])
     async def list(self, ctx:commands.Context):
@@ -558,15 +558,16 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def endraffle(self, ctx:commands.Context):
-            csvm.resetEligible()
+        if ctx.author.is_mod:
+            cvm.resetEligible()
             global joinAvail
             joinAvail = 0
-            winner = csvm.getWinner()
+            winner = cvm.getWinner()
             if winner == 0:
                 await ctx.send(f'No one entered the raffle.')
             else:
-                csvm.addRaffleWin(winner)
-                csvm.resetRaffle()
+                cvm.addRaffleWin(winner)
+                cvm.resetRaffle()
                 await ctx.send(f'{winner} wins! You get NOTHING!')
 
 
