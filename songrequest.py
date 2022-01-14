@@ -1,5 +1,5 @@
 import gspread
-from gspread.models import Cell
+from gspread import Cell
 from oauth2client.service_account import ServiceAccountCredentials
 import urllib.request
 import re
