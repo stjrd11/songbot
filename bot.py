@@ -559,15 +559,15 @@ class Bot(commands.Bot):
     @commands.command()
     async def endraffle(self, ctx:commands.Context):
         if ctx.author.is_mod:
-            cvm.resetEligible()
+            csvm.resetEligible()
             global joinAvail
             joinAvail = 0
-            winner = cvm.getWinner()
+            winner = csvm.getWinner()
             if winner == 0:
                 await ctx.send(f'No one entered the raffle.')
             else:
-                cvm.addRaffleWin(winner)
-                cvm.resetRaffle()
+                csvm.addRaffleWin(winner)
+                csvm.resetRaffle()
                 await ctx.send(f'{winner} wins! You get NOTHING!')
 
 
