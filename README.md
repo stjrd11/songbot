@@ -15,22 +15,19 @@ Video Coming soon, this all look nicer, etc. Here's the rough draft for the comm
 3.	Install vs code here: https://code.visualstudio.com/download follow instructions
 4.	Download code from github: https://github.com/stjrd11/songbot  (Code -> Download Zip) and unzip into a folder
 5.	Open Anaconda Prompt (type anaconda into the windows search bar and look for Anaconda Prompt). Type the following into Anaconda Prompt:
-•	Pip install twitchio 
-•	Pip install oauth2client
-•	Pip install pytube
-•	Pip install gspread
+		a. pip install -r requirements.txt
 6.	Open the command prompt by typing cmd into the windows search bar. Type the following two lines into the prompt:
-•	Npm install @twurple/auth
-•	Npm install @twurple/chat
+		a. Npm install @twurple/auth
+		b. Npm install @twurple/chat
 7.	Go to https://console.developers.google.com/ and create a new project.
-•	In the box labeled “Search for APIs and Services” search for Google Drive API and Google Sheets API and enable them both.
-•	Go to APIS & Services, then go to “Credentials.” Choose “Create credentials > Service account”
-•	Fill out form. Name can be anything, Role should be editor, and no need to grant anyone else access to the account. Click Done.
-•	Go to “Manage Service Accounts” above Service Accounts.
-•	Press on the three vertical dots near the recently created service account and select “Manage keys” then click “Add key > Create new key”
-•	Select JSON key type and press create. Save this new .json file in the same folder where the song bot is, and rename it to ‘credentials.json’
+		a. In the box labeled “Search for APIs and Services” search for Google Drive API and Google Sheets API and enable them both.
+		b. Go to APIS & Services, then go to “Credentials.” Choose “Create credentials > Service account”
+		c. Fill out form. Name can be anything, Role should be editor, and no need to grant anyone else access to the account. Click Done.
+		d. Go to “Manage Service Accounts” above Service Accounts.
+		e. Press on the three vertical dots near the recently created service account and select “Manage keys” then click “Add key > Create new key”
+		f. Select JSON key type and press create. Save this new .json file in the same folder where the song bot is, and rename it to ‘credentials.json’
 8.	Go to Google Sheets: https://www.google.com/sheets/about/ 
-•	Create a blank sheet and call it SongBank or something similar. Inside, you will make two separate sheets. One for the queue, and one for the History. On the bottom, create a new sheet. Label the first one “Queue” or something similar, and the second one as “SongHistory” or something similar.
+		a. Create a blank sheet and call it SongBank or something similar. Inside, you will make two separate sheets. One for the queue, and one for the History. On the bottom, create a new sheet. Label the first one “Queue” or something similar, and the second one as “SongHistory” or something similar.
 •	On the “Queue” sheet, label the following cells:
 			A1: Song
 			B1: Length
