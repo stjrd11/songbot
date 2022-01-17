@@ -1,14 +1,14 @@
 # songbot
-THIS WILL BE FORMATTED AND LOOK PRETTIER SOON
 
-rough template for a song bot utilizing google sheets and twitchio
+## About
 
-if you decide to use this, let me know if you experience issues
+This is a songbot I built using Twitchio, Gspread, and Pytube libraries in Python, along with Twurple in Node.js. This bot is meant to generally replace/relieve mods/streamers from modding a queue in a music stream on Twitch, although you can use it as any sort of queue system for videos in a stream. It can automatically bump requests on a bump/raid/cheer. Please note that this bot is NOT meant to totally replace a more complete streaming bot like StreamElements/StreamLabs/etc., but more to complement/replace the queue system.
 
-*It can currently automatically bump songs. A full run through of what needs to be done to use this is coming soon
+If you run into any issues, please either post on Github or contact me through discord: Slam#1253
 
+## Video Guide
 
-Video Coming soon, this all look nicer, etc. Here's the rough draft for the commands and installation instructions.
+Coming soon
 
 ## Installation
 
@@ -125,3 +125,7 @@ Both portions of the bot should now be running. Make a batch command to avoid ha
 * !endprio – Mod only command that ends the raffle, and the winner gets a priority bump.
 * !endbump – Mod only command that ends the raffle, and the winner gets a bump.
 * !endraffle – Mod only command that ends the raffle, and the winner gets nothing (or your own reward, but the bot doesn’t give them anything.
+
+**Credits
+
+Big thanks to the developers of Gspread, Pytube, Twurple, and TwitchIO (especially the folks on the Pythonista discord server for answering my dumb questions). Also thanks to pretzel for being my beta tester, and to jonandjosh for letting me use their stream as a test bed.
