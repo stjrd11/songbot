@@ -15,7 +15,7 @@ Video Coming soon, this all look nicer, etc. Here's the rough draft for the comm
 3.	Install vs code here: https://code.visualstudio.com/download follow instructions
 4.	Download code from github: https://github.com/stjrd11/songbot  (Code -> Download Zip) and unzip into a folder
 5.	Open Anaconda Prompt (type anaconda into the windows search bar and look for Anaconda Prompt). Type the following into Anaconda Prompt:
-		a. pip install -r requirements.txt
+* pip install -r requirements.txt
 6.	Open the command prompt by typing cmd into the windows search bar. Type the following two lines into the prompt:
 		a. Npm install @twurple/auth
 		b. Npm install @twurple/chat
