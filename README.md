@@ -8,7 +8,7 @@ If you run into any issues, please either post on Github or contact me through d
 
 ## Video Guide
 
-Coming soon
+[YouTube Link](https://youtu.be/brA-o2zlLFk)
 
 ## Installation
 
@@ -75,7 +75,7 @@ Coming soon
   * Next, open up tokens.json and fill in access token and refresh token from generator site.
 
 The song bot is now ready to start. Open up a command prompt and an anaconda prompt. Navigate to the folder where the files are located using the ‘cd’ command in BOTH prompts (example: if your songbot folder is in a folder called ‘Twitch’, you would use the command ‘cd twitch/songbot’ to get to the folder). For the anaconda prompt, type ‘python bot.py’ and for the command prompt, type ‘node nodebot.js’
-Both portions of the bot should now be running. Make a batch command to avoid having to open prompts and change directories (see end of tutorial installation video for more details)
+Both portions of the bot should now be running. Make a batch command to avoid having to open prompts and change directories. [Click here](https://youtu.be/brA-o2zlLFk?t=1478) for explanation in tutorial video.
 
 ## Commands List
 
