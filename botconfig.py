@@ -3,6 +3,7 @@ maxBumpsPerStream = ####
 maxPlayedBumpsPerStream = ###
 maxStoredBumps = ###
 maxStoredPrio = ###
+maxSongsInQ = #max number of songs a user can have in the queue
 spreadsheetName = #name of Spreadsheet
 songBank = #name of song bank sheet
 songHistory = #Name of song history sheet
