@@ -126,6 +126,6 @@ Both portions of the bot should now be running. Make a batch command to avoid ha
 * !endbump – Mod only command that ends the raffle, and the winner gets a bump.
 * !endraffle – Mod only command that ends the raffle, and the winner gets nothing (or your own reward, but the bot doesn’t give them anything.
 
-** Credits
+## Credits
 
 Big thanks to the developers of Gspread, Pytube, Twurple, and TwitchIO (especially the folks on the Pythonista discord server for answering my dumb questions). Also thanks to pretzel for being my beta tester, and to jonandjosh for letting me use their stream as a test bed. Finally, thanks to my regular viewers who put up with all the bugs and whatnot. Preesh.
