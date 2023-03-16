@@ -6,9 +6,9 @@ This is a songbot I built using Twitchio, Gspread, and Pytube libraries in Pytho
 
 If you run into any issues, please either post on Github or contact me through discord: Slam#1253
 
-## Video Guide
+## NOTICE
 
-[YouTube Link](https://youtu.be/brA-o2zlLFk)
+If it wasn't obvious, this program is not being actively devloped anymore. Though it was a fun project, it clearly didn't get much use from anyone. Anyone programming-minded can absolutely use this project in anyway they see fit.
 
 ## Installation
 
