@@ -8,7 +8,7 @@ If you run into any issues, please either post on Github or contact me through d
 
 ## NOTICE
 
-If it wasn't obvious, this program is not being actively devloped anymore. Though it was a fun project, it clearly didn't get much use from anyone. Anyone programming-minded can absolutely use this project in anyway they see fit.
+If it wasn't obvious, this program is not being actively devloped anymore. Though it was a fun project, it clearly didn't get much use from anyone. Anyone programming-minded can absolutely use this project in any way they see fit.
 
 ## Installation
 
